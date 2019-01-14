@@ -355,9 +355,43 @@ variables = [
 
 ]
 
+mail_actions = [
+	{
+		'name':'--enable-check',
+		'desc_cn':'审核'
+	},
+	{
+		'name': '--enable-execute',
+        'desc_cn':'执行'
+	},
+	{
+		'name': 'approve',
+        'desc_cn':'审批通过'
+	},
+	{
+		'name': 'disapprove',
+        'desc_cn':'审批拒绝'
+	},
+	{
+		'name': 'reject',
+        'desc_cn':'放弃'
+	},
+	{
+		'name': 'rollback',
+        'desc_cn':'回滚'
+	},
+]
+
 inception_conn = [
 	{
 		'host':'127.0.0.1',
 		'port':6669
+	}
+]
+
+sql_settings = [
+	{
+		'forbidden_words':'',
+		'sql_count_limit':1000
 	}
 ]

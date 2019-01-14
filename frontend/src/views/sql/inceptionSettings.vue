@@ -9,9 +9,9 @@
 <template>
     <div>
         <Row>            
-            <Col span="6">
+            <Col span="8">
                 <Card>
-                    <Alert show-icon>inception配置</Alert>
+                    <Alert show-icon>inception连接</Alert>
                     <div style="height:510px">
                         <Tabs>
                             <TabPane label="inception服务">
@@ -59,7 +59,7 @@
                     </div>
                 </Card>
             </Col>
-            <Col span="18">
+            <Col span="16">
                 <Card>
                     <div class="inner">
                         <Alert show-icon>inception变量</Alert>
@@ -302,8 +302,8 @@
             HandleCheckConn (data) {
                 CheckConn(data)
                 .then(res => {
-                    console.log(res)
                     const status = res.data.status
+                    const data = res.data.data
                     if (status == 0) {
                         this.$Message.success(
                             {
@@ -314,8 +314,8 @@
                     } else {
                         this.$Message.warning(
                             {
-                                content:'连接失败',
-                                duration: 3
+                                content:'连接失败 （' + data + '）',
+                                duration: 8
                             }
                         )
                     }

@@ -8,9 +8,10 @@ from django.conf import settings
 from utils.tasks import send_mail
 from utils.basemixins import AppellationMixins
 from utils.dbcrypt import prpcrypt
+from utils.baseviews import ReturnFormatMixin as res
 from utils.sqltools import Inception
-from .models import *
 from .data import inception_conn
+from .models import *
 
 class FixedDataMixins(object):
 
@@ -51,6 +52,7 @@ class ChangeSpecialCharacterMixins(object):
         return forbiddens
 
 class InceptionConn(object):
+
     error_tag = 'error'
     model = InceptionConnection
 
@@ -64,20 +66,21 @@ class InceptionConn(object):
         return 'mysql -h{} -P{}'.format(obj.host, obj.port)
 
     def get_mysql_conn(self, params):
-        return 'mysql -h{} -P{} -u{} -p{} -e "show databases" '.format(
+        return 'mysql -h{} -P{} -u{} -p{} -e "use {}" '.format(
             params.get('host'),
             params.get('port'),
             params.get('user'),
-            params.get('password')
+            params.get('password'),
+            params.get('db')
         )
 
 class CheckConn(InceptionConn):
-    pc = prpcrypt()
+
     conf = configparser.ConfigParser()
     file_path = settings.INCEPTION_SETTINGS.get('file_path')
 
     def check(self, request):
-        res = {'status':0, 'data':''}
+        ret = res.get_ret()
         request_data = request.data
         check_type = request_data.get('check_type')
         if check_type == 'inception_conn':
@@ -88,30 +91,31 @@ class CheckConn(InceptionConn):
             if check_type == 'inception_backup':
                 self.conf.read(self.file_path)
                 password = self.conf.get('inception', 'inception_remote_system_password')
-                request_data['password'] = password
                 params = request_data
+                params['password'] = password
+                params['db'] = 'inception'
             elif check_type == 'update_target_db':
                 db_id = request_data.get('id')
                 instance = Dbconf.objects.get(id=db_id)
                 params = {
+                    'db': instance.name,
                     'host': instance.host,
                     'port': instance.port,
                     'user': instance.user,
-                    'password': self.pc.decrypt(instance.password)
+                    'password': prpcrypt.decrypt(instance.password)
                 }
             elif check_type == 'create_target_db':
                 params = request_data
             cmd = self.get_mysql_conn(params)
         popen = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         lines = popen.stdout.readlines()
-        last_item = lines[-1].decode('gbk')
+        last_item = lines[-1].decode('gbk') if len(lines) > 0 else ''
         if self.error_tag in last_item.lower():
-            res['status'] = -1
-            res['data'] = last_item
-        return res
+            ret['status'] = -1
+            ret['data'] = last_item
+        return ret
 
 class HandleInceptionSettingsMixins(InceptionConn):
-
     backup_variables = [
         'inception_remote_backup_host',
         'inception_remote_backup_port',
@@ -147,10 +151,10 @@ class HandleInceptionSettingsMixins(InceptionConn):
 
 class ActionMixins(AppellationMixins):
 
-    pc = prpcrypt()
     type_select_tag = 'select'
     action_type_execute = '--enable-execute'
     action_type_check = '--enable-check'
+    success_tag = 'Execute Successfully\nBackup successfully'
 
     def get_reject_step(self, instance):
         user = self.request.user
@@ -178,7 +182,7 @@ class ActionMixins(AppellationMixins):
         return instance.is_manual_review
 
     def get_db_addr(self, user, password, host, port, actiontype):
-        password = self.pc.decrypt(password)
+        password = prpcrypt.decrypt(password)
         dbaddr = '--user={}; --password={}; --host={}; --port={}; {};'.format(user, password, host, port, actiontype)
         return dbaddr
 
@@ -218,12 +222,14 @@ class ActionMixins(AppellationMixins):
             raise ParseError({self.exception_sqls: exception_sqls})
         return (success_sqls, exception_sqls, json.dumps(result))
 
-    def mail(self, sqlobj, mailtype):
-        if sqlobj.env == self.env_prd:
-            username = self.request.user.username
+    def mail(self, sqlobj, mail_type):
+        mail_action = MailActions.objects.get(name=mail_type)
+        if (sqlobj.env == self.env_prd) and mail_action.value:
+            user = self.request.user
             treater = sqlobj.treater
             commiter = sqlobj.commiter
-            mailto_users = [treater, commiter]
+            admin_mail = user.admin_mail
+            mailto_users = [treater, commiter, admin_mail]
             mailto_users = list(set(mailto_users))
             mailto_list = [u.email for u in User.objects.filter(username__in = mailto_users)]
-            send_mail.delay(mailto_list, username, sqlobj.id, sqlobj.remark, mailtype, sqlobj.sql_content, sqlobj.db.name)
+            send_mail.delay(mailto_list, user.username, sqlobj.id, sqlobj.remark, mail_type, sqlobj.sql_content, sqlobj.db.name)

@@ -43,20 +43,20 @@
               <Option value="test" >测试</Option>
             </Select>
           </FormItem>
-          <FormItem label="数据库名：" prop="name">
-            <Input v-model="createDbForm.name"></Input>
-          </FormItem>
           <FormItem label="地址：" prop="host">
-            <Input v-model="createDbForm.host"></Input>
+            <Input v-model="createDbForm.host" placeholder="mysql地址"></Input>
           </FormItem>
           <FormItem label="端口：" prop="port">
-            <Input v-model="createDbForm.port"></Input>
+            <Input v-model="createDbForm.port" placeholder="mysql端口"></Input>
           </FormItem>
           <FormItem label="用户名：" prop="user">
-            <Input v-model="createDbForm.user"></Input>
+            <Input v-model="createDbForm.user" placeholder="mysql用户名"></Input>
           </FormItem>
           <FormItem label="密码：" prop="password">
-            <Input v-model="createDbForm.password" type="password"></Input>
+            <Input v-model="createDbForm.password" type="password" placeholder="mysql密码"></Input>
+          </FormItem>
+          <FormItem label="库名：" prop="name">
+            <Input v-model="createDbForm.name" placeholder="mysql实际的库名"></Input>
           </FormItem>
           <FormItem label="备注：" prop="remark">
             <Input v-model="createDbForm.remark"></Input>
@@ -85,20 +85,20 @@
               <Option value="test" >测试</Option>
             </Select>
           </FormItem>
-          <FormItem label="数据库名：" prop="name">
-            <Input v-model="updateDbForm.name"></Input>
-          </FormItem>
           <FormItem label="地址：" prop="host">
-            <Input v-model="updateDbForm.host"></Input>
+            <Input v-model="updateDbForm.host" placeholder="mysql地址"></Input>
           </FormItem>
           <FormItem label="端口：" prop="port">
-            <Input v-model="updateDbForm.port"></Input>
+            <Input v-model="updateDbForm.port" placeholder="mysql端口"></Input>
           </FormItem>
           <FormItem label="用户名：" prop="user">
-            <Input v-model="updateDbForm.user"></Input>
+            <Input v-model="updateDbForm.user" placeholder="mysql用户名"></Input>
           </FormItem>
           <FormItem label="密码：" prop="password">
-            <Input v-model="updateDbForm.password" type="password"></Input>
+            <Input v-model="updateDbForm.password" type="password" placeholder="mysql密码"></Input>
+          </FormItem>
+          <FormItem label="库名：" prop="name">
+            <Input v-model="updateDbForm.name" placeholder="mysql实际的库名"></Input>
           </FormItem>
           <FormItem label="备注：" prop="remark">
             <Input v-model="updateDbForm.remark"></Input>
@@ -311,10 +311,11 @@
           }
           const data = {
             check_type: 'create_target_db',
-            host:this.createDbForm.host,
-            port:this.createDbForm.port,
-            user:this.createDbForm.user,
-            password:this.createDbForm.password,
+            db: this.createDbForm.name,
+            host: this.createDbForm.host,
+            port: this.createDbForm.port,
+            user: this.createDbForm.user,
+            password: this.createDbForm.password,
           }
           this.handleCheckConn(data)
         })
@@ -332,8 +333,8 @@
         CheckConn(data)
         .then(
           res => {
-            console.log(res)
             const status = res.data.status
+            const data = res.data.data
             if (status == 0) {
                 this.$Message.success(
                     {
@@ -344,8 +345,8 @@
             } else {
                 this.$Message.warning(
                     {
-                        content:'连接失败',
-                        duration: 3
+                        content:'连接失败 （' + data + '）',
+                        duration: 8
                     }
                 )
             }
@@ -387,11 +388,7 @@
       handleDeleteDb () {
         DeleteDb(this.deleteId)
         .then(res => {
-          console.log(res)
           this.initData()
-        })
-        .catch(error => {
-          console.log(error)
         })
       },
      
@@ -412,7 +409,6 @@
         GetClusterList(this.getClusterParams)
         .then(
           res => {
-            console.log(res)
             this.spinShow = false
             this.clusterList = res.data.results
           }
@@ -422,7 +418,6 @@
       cancel () {
         Message.info('Clicked cancel');
       }
-
 
     },
 

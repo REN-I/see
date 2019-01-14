@@ -47,37 +47,50 @@
         <Row>
           <Col span="12">
             <FormItem label="角色：">
-                <Select v-model="createUserForm.role">
-                    <Option v-for="item in roleList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                </Select>
+              <Select v-model="createUserForm.role">
+                <Option v-for="item in roleList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+              </Select>
             </FormItem>
           </Col>
           <Col span="12">
             <FormItem label="属组：">
-                <Select v-model="createUserForm.groups[0]">
-                    <Option v-for="item in groupList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                </Select>
+              <Select v-model="createUserForm.groups[0]">
+                <Option v-for="item in groupList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+              </Select>
             </FormItem>
           </Col>
         </Row>
-        <FormItem label="权限：">          
-          <Transfer
-            filterable
-            :data="permissionList"
-            :target-keys="targetKeysCreate"
-            :filter-method="filterMethod"
-            @on-change="handleChangeCreate"
-            :list-style="listStyle"
-            :titles="transferTitles">
-          </Transfer>
-        </FormItem>
-        <FormItem label="系统身份：" prop="systemAccount">
-          <CheckboxGroup v-model="createUserForm.sysaccount">
-              <Checkbox label="is_active">已激活</Checkbox>
-              <Checkbox label="is_staff">登录后台</Checkbox>
-              <Checkbox label="is_superuser">管理员</Checkbox>
-          </CheckboxGroup>
-        </FormItem>        
+        <Row>
+          <Col span="24">      
+            <FormItem label="权限：">          
+              <Transfer
+                filterable
+                :data="permissionList"
+                :target-keys="targetKeysCreate"
+                :filter-method="filterMethod"
+                @on-change="handleChangeCreate"
+                :list-style="listStyle"
+                :titles="transferTitles">
+              </Transfer>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="12">
+            <FormItem label="系统身份：" prop="systemAccount">
+              <CheckboxGroup v-model="createSysaccount">
+                <Checkbox label="is_active">已激活</Checkbox>
+                <Checkbox label="is_staff">登录后台</Checkbox>
+                <Checkbox label="is_superuser">管理员</Checkbox>
+              </CheckboxGroup>
+            </FormItem>    
+          </Col> 
+          <Col span="12">
+            <FormItem label="邮箱：" prop="email">
+              <Input v-model="createUserForm.email"></Input>
+            </FormItem>   
+          </Col>
+        </Row>   
       </Form>  
     </Modal>      
 
@@ -95,45 +108,58 @@
             </FormItem>
           </Col>
           <Col span="12">
-            <FormItem label="新密码：" prop="password">
-              <Input type="password" v-model="updateUserForm.newpassword"></Input>
+            <FormItem label="密码：" prop="password">
+              <Input type="password" v-model="updateUserForm.password"></Input>
             </FormItem>
           </Col>
         </Row>
         <Row>
           <Col span="12">
             <FormItem label="角色：">
-                <Select v-model="updateUserForm.role">
-                    <Option v-for="item in roleList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                </Select>
+              <Select v-model="updateUserForm.role">
+                <Option v-for="item in roleList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+              </Select>
             </FormItem>
           </Col>
           <Col span="12"> 
             <FormItem label="属组：">
-                <Select v-model="updateUserForm.groups[0]">
-                    <Option v-for="item in groupList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                </Select>
+              <Select v-model="updateUserForm.groups[0]">
+                <Option v-for="item in groupList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+              </Select>
             </FormItem>
           </Col>
         </Row>
-        <FormItem label="权限：">          
-          <Transfer
-            :data="updateUserForm.permissionList"
-            :target-keys="targetKeysupdate"
-            filterable
-            :filter-method="filterMethod"
-            @on-change="handleChangeupdate"
-            :list-style="listStyle"
-            :titles="transferTitles">
-          </Transfer>
-        </FormItem>
-        <FormItem label="系统身份：">
-          <CheckboxGroup v-model="updateUserForm.sysaccount">
-              <Checkbox label="is_active">已激活</Checkbox>
-              <Checkbox label="is_staff">登录后台</Checkbox>
-              <Checkbox label="is_superuser">管理员</Checkbox>
-          </CheckboxGroup>
-        </FormItem>           
+        <Row>
+          <Col span="24">
+            <FormItem label="权限：">          
+              <Transfer
+                :data="updateUserForm.permissionList"
+                :target-keys="targetKeysupdate"
+                filterable
+                :filter-method="filterMethod"
+                @on-change="handleChangeupdate"
+                :list-style="listStyle"
+                :titles="transferTitles">
+              </Transfer>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="12">
+            <FormItem label="系统身份：">
+              <CheckboxGroup v-model="updateSysaccount">
+                <Checkbox label="is_active">已激活</Checkbox>
+                <Checkbox label="is_staff">登录后台</Checkbox>
+                <Checkbox label="is_superuser">管理员</Checkbox>
+              </CheckboxGroup>
+            </FormItem>   
+          </Col>
+          <Col span="12">
+            <FormItem label="邮箱：" prop="email">
+              <Input v-model="updateUserForm.email"></Input>
+            </FormItem>   
+          </Col>
+        </Row>        
       </Form>  
     </Modal>  
   
@@ -202,41 +228,51 @@
           modal:false,
           permissions:[],
         },
+        baseAuth:['is_active', 'is_staff', 'is_superuser'],
         // 创建用户数据
+        createSysaccount:['is_active', 'is_staff'],
         createUserForm: {
           username:'',
           password:'',
-          sysaccount:['is_active', 'is_staff'],
+          email:'',
           role:'developer',
           groups:[],
         },
         ruleCreateUserForm: {
           username: [{ required: true, message: '用户名不能为空', trigger: 'blur' }],
           password: [{ required: true, message: '密码不能为空', trigger: 'blur' }],
+          email: [{ required: true, message: '邮箱不能为空', trigger: 'blur' }],
         },
         // 修改用户数据
+        updateSysaccount:[],
         updateUserForm: {
           id: '',
           username:'',
           password:'',
-          newpassword:'',
+          email:'',
           permissionList:[],  //  此处赋值'' ，会引起 vue.esm.js:591 [Vue warn]: Invalid prop: type check failed for prop "data". Expected Array, got String.
-          sysaccount:[],
           role:'',
           groups:[],
         },
         ruleUpdateUserForm: {
           username: [{ required: true, message: '用户名不能为空', trigger: 'blur' }],
+          email: [{ required: true, message: '邮箱不能为空', trigger: 'blur' }],
         },
         columnsUser: [
           {
               title: '用户名',
+              width:150,
               render: (h, params) => {
-                return h('Avatar', {style:{color: "#f56a00",backgroundColor: "#fde3cf"}}, params.row.username)
+                return h('Tag', {}, params.row.username)
               }
           },
           {
+              title: '邮箱',
+              key: 'email'
+          },
+          {
               title: '角色',
+              width:100,
               render: (h, params) => {
                 const roleMap = {
                   developer:'研发',
@@ -249,13 +285,13 @@
           },
           {
               title: '属组',
-              key: 'groups',
               render: (h, params) => {
                 return h('span', {}, params.row.groups.name)
               }
           },
           {
               title: '权限',
+              width:80,
               render: (h, params) => {
                 let perms = params.row.perms
                 if (perms.length == 0) {
@@ -307,7 +343,6 @@
           },
           {
               title: '操作',
-              key: 'action',
               width: 150,
               align: 'center',
               render: (h, params) => {
@@ -327,10 +362,9 @@
                           this.updateUserForm.id = params.row.id
                           this.updateUserForm.username = params.row.username
                           this.updateUserForm.role = params.row.role
+                          this.updateUserForm.email = params.row.email
                           this.updateUserForm.groups = JSON.stringify(params.row.groups) == "{}" ? [] : [params.row.groups.id]
-                          console.log(this.updateUserForm.role)
                           this.updateUserForm.password = params.row.password
-                          this.updateUserForm.newpassword = ''
                           // 系统身份
                           let sysaccount = []
                           if (params.row.is_superuser == true) {
@@ -342,7 +376,7 @@
                           if (params.row.is_staff == true) {
                             sysaccount.push('is_staff')
                           }
-                          this.updateUserForm.sysaccount = sysaccount
+                          this.updateSysaccount = sysaccount
                           // 用户的权限数据
                           let perms = []
                           let userperms = params.row.perms
@@ -436,7 +470,6 @@
       },
 
       groupsFormat (grouplist) {
-        console.log(grouplist)
         let groups = []
         grouplist.map( (item) => {
           groups.push({
@@ -446,7 +479,6 @@
         })
         this.groupList = groups
         this.createUserForm.groups = groups.length > 0 ? [groups[0].value] : [] // 设置 groups 默认值 
-        console.log(this.createUserForm.groups)
       },
 
       handleChangeCreate (newTargetKeys) {
@@ -461,12 +493,23 @@
         return data.label.indexOf(query) > -1;
       },
 
+      getSysaccount (sysaccount, data) {
+        for (let auth in this.baseAuth){
+          data[this.baseAuth[auth]] = 0
+        }
+        for (let acc in sysaccount){
+          data[sysaccount[acc]] = 1
+        }
+        return data
+      },
       handleCreateUser () {
         this.$refs.createUserForm.validate((valid) => {
           if (!valid) {
             return
           }
+          let sysaccount = this.createSysaccount
           let data = this.createUserForm
+          data = this.getSysaccount(sysaccount, data)
           data.user_permissions = this.targetKeysCreate
           CreateUser(data)
           .then(response => {
@@ -478,24 +521,20 @@
             }
             this.handleGetUserList()
           })
-          .catch(error => {
-            console.log(error)
-          })
         })
       },
-
       handleUpdateUser () {
         this.$refs.updateUserForm.validate((valid) => {
           if (!valid) {
             return
           }
+          let sysaccount = this.updateSysaccount
           let data = this.updateUserForm
+          data = this.getSysaccount(sysaccount, data)
           data.user_permissions = this.targetKeysupdate
           delete data.permissionList
-          console.log('----- ', data)
           UpdateUser(this.updateUserForm.id, data)
           .then(response => {
-            console.log(response)
             let httpstatus = response.status
             if (httpstatus == 200) {
               let title = '服务器提示'
@@ -503,9 +542,6 @@
               this.notice(title, msg)
             }
             this.handleGetUserList()
-          })
-          .catch(error => {
-            console.log(error)
           })
         })
       },
@@ -522,9 +558,6 @@
           }
           this.handleGetUserList()
         })
-        .catch(error => {
-          console.log(error)
-        })
       },
 
       handleGetPermissonList () {
@@ -533,9 +566,6 @@
           console.log(response)
           let permissonlist = response.data.results
           this.permsFormat(permissonlist)
-        })
-        .catch(error => {
-          console.log(error)
         })
       },
 
@@ -546,18 +576,12 @@
           this.userList = response.data.results
           this.total = response.data.count
         })
-        .catch(error => {
-          console.log(error)
-        })
       },
 
       handleGetGroupList () {
         GetGroupList(this.getParams)
         .then(response => {
           this.groupsFormat(response.data.results)
-        })
-        .catch(error => {
-          console.log(error)
         })
       },
 

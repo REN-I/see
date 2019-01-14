@@ -10,5 +10,7 @@ class SqlFileView(DownloadBaseView):
 
     def get_content(self):
         pk = self.kwargs.get('pk')
-        content = self.model.objects.get(pk=pk).handle_result
+        data_type = self.request.GET.get('data_type')
+        instance = self.model.objects.get(pk=pk)
+        content = getattr(instance, data_type)
         return content

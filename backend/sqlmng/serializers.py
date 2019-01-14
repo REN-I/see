@@ -52,10 +52,10 @@ class DbSerializer(SetEncryptMixins, serializers.ModelSerializer):
         ret['cluster'] = {'id':cluster.id, 'name':cluster.name} if cluster else {}
         return ret
 
-class ForbiddenWordsSerializer(serializers.ModelSerializer):
+class SqlSettingsSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = ForbiddenWords
+        model = SqlSettings
         fields = '__all__'
 
 class StrategySerializer(serializers.ModelSerializer):
@@ -72,18 +72,23 @@ class PersonalSerializer(AppellationMixins, serializers.ModelSerializer):
         model = User
         fields = '__all__'
 
+    def get_commiter(self, instance):
+        return {'id':instance.id, 'username':instance.username}
+
     def get_leader(self, env, instance):
         leader_obj = instance.leader if env == self.env_prd else instance
         leader = {'id':leader_obj.id, 'username':leader_obj.username} if leader_obj else {}
         return leader
 
-    def get_db_list(self, env, instance):
+    def get_db_list(self, instance):
         db_queryset = instance.dbconf_set.all()
         db_list = []
         if db_queryset:
             for db in db_queryset:
-                cluster_id = db.cluster.id if db.cluster else None
-                cluster_name = db.cluster.name if db.cluster else None
+                cluster = db.cluster
+                if not cluster:continue
+                cluster_id = cluster.id
+                cluster_name = cluster.name
                 row = {
                     'id': db.id,
                     'name': db.name,
@@ -94,14 +99,11 @@ class PersonalSerializer(AppellationMixins, serializers.ModelSerializer):
                 db_list.append(row)
         return db_list
 
-    def get_commiter(self, instance):
-        return {'id':instance.id, 'username':instance.username}
-
     def to_representation(self, instance):
         env = self.context['request'].GET.get('env')
         ret = super(PersonalSerializer, self).to_representation(instance)
         ret['leader'] = self.get_leader(env, instance)
-        ret['db_list'] = self.get_db_list(env, instance)
+        ret['db_list'] = self.get_db_list(instance)
         ret['commiter'] = self.get_commiter(instance)
         return ret
 
@@ -148,4 +150,10 @@ class InceptionConnectionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = InceptionConnection
+        fields = '__all__'
+
+class MailActionsSettingsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = MailActions
         fields = '__all__'

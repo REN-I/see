@@ -1,8 +1,12 @@
 <style scoped>
-    .parm_check_element {
-      width: 200px;
-      margin-left: 10px;
-    }
+  .parm_check_element {
+    width: 400px;
+    margin-left: 10px;
+  }
+  .left20 {
+    margin-left: 20px
+  }
+
 </style>
 
 <template>
@@ -36,9 +40,9 @@
                 </FormItem>
               </Form>
             </div>
-            </Col>
+        </Col>
 
-          <Col span="12">
+        <Col span="12">
             <Alert show-icon style='margin-left:12%'>
               <Icon type="ios-lightbulb-outline" slot="icon"></Icon>
                 选择执行条件
@@ -46,30 +50,30 @@
             <div style='margin-left:50px'>
               </br>
               <div>
-                <Form class="step-form" ref="checkConf" :model="checkData" :rules="ruleCheckData" :label-width="100">
+                <Form ref="checkConf" :model="checkData" :rules="ruleCheckData" :label-width="100">
                   <FormItem label="目标数据库">
-                     <Cascader :data="targetDbs" v-model="targetDb" trigger="hover" class="parm_check_element" @on-change="handleSelect"></Cascader>
+                    <Cascader :data="targetDbs" v-model="targetDb" trigger="hover" class="parm_check_element" @on-change="handleSelect"></Cascader>
                   </FormItem>
                   <FormItem label="工单核准人" prop="treater">
-                      <Input v-model="checkData.treater_username" class="parm_check_element" :readonly="readonly" />
+                    <Input v-model="checkData.treater_username" class="parm_check_element" :readonly="readonly" />
                   </FormItem>
                 </Form>
               </div>
               <div>
                 <Alert type="warning" show-icon closable>
-                    <p><b>Tips</b></p>
+                <p><b>Tips</b></p>
                 <template slot="desc">
                   <p>
                     <b>1</b>.  您可以在<router-link to='/sqlmng/settings'><b>设置</b></router-link>里指定常用的数据库&工单核准人，之后只显示这些数据供您选择。
                   </p>
                   <p>
-                    <b>2</b>.  关于流程
+                    <b>2</b>.  关于流程 (由管理员在 <router-link to='/settings/platform'><b>流程设置</b></router-link>里指定 )
                   </p>
-                  <p style="margin-left:20px">
-                    <b>2.1</b>. 若管理员没有设置流程，工单将按 提交人 --- 执行人 的流程进行处理。
+                  <p class="left20">
+                    <b>2.1</b>. 关闭流程，工单流: 提交人 --- 核准人 。
                   </p>
-                  <p style="margin-left:20px">
-                    <b>2.2</b>. 若管理员有设置流程，工单将按 提交人 --- 审批人 --- 执行人 的流程进行处理。
+                  <p class="left20">
+                    <b>2.2</b>. 开启流程，工单流: 提交人 --- 核准人 --- 管理员 。
                   </p>
                 </template>
                 </Alert>
@@ -114,7 +118,7 @@
         commiter:{},
         ruleCheckData:{
           sql_content:[{ required: true, message: '请输入SQL', trigger: 'blur' }],
-          treater:[{ required: true, message: '请选择执行人', trigger: 'change', type: 'number' }],
+          treater:[{ required: true, message: '请设置工单核准人', trigger: 'change', type: 'number' }],
           db: [{ required: true, message: '请选择数据库', trigger: 'change', type: 'array', len: 3, fields: {0: {type: "number", required: true},1: {type: "string", required: true},2: {type: "number", required: true}} }],
         },
         targetDb:[],
@@ -211,9 +215,6 @@
           })
           this.targetDbs = CascaderData(dbs)       
         })
-        .catch(error => {
-          console.log(error)
-        })
       },
       
       handleCheckSql () {
@@ -237,9 +238,6 @@
               } else if (status == -1 || status == -2){
                 this.warning('SQL审核不通过', msg)
               } 
-            })
-            .catch(error => {
-              console.log(error)
             })
           })
         })

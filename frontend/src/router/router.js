@@ -60,12 +60,12 @@ export const appRouter = [{
     {
         path: '/sqlquery',
         icon: 'cube',
-        title: '查询优化',
+        title: 'SQL优化',
         name: 'sqlquery',
         component: Main,
         children: [{
             path: 'optimize',
-            title: '查询优化',
+            title: 'SQL优化',
             name: 'optimize',
             component: () =>
                 import ('@/views/sql/optimize.vue')
@@ -134,7 +134,7 @@ export const appRouter = [{
 
     {
         path: '/target',
-        icon: 'shuffle',
+        icon: 'earth',
         title: '目标库管理',
         name: 'target',
         component: Main,

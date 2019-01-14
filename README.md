@@ -8,6 +8,11 @@
 ![](https://img.shields.io/badge/python-3.6-brightgreen.svg)
 ![](https://img.shields.io/badge/Django-2.0-brightgreen.svg)
 
+## API集成
+- **Inception**: 去哪儿网开源，提供SQL语句审核、执行、回滚功能
+- **SQLAdvisor**: 美团开源，提供分析SQL中的where条件、聚合条件、多表Join关系，输出索引优化建议
+- **SOAR**: 小米开源，提供SQL启发式算法的语句优化、多列索引优化等功能
+
 ## 功能简介
 
 - 目标库管理
@@ -23,6 +28,7 @@
     - 查询目标数据库的详细表结构
     - 查询表数据，对结果可导出文件
     - SQL语句优化（基于美团SQLAdvisor）
+    - 多层次优化建议（基于小米SOAR）
 - 用户管理
     - 对用户/组的注册/注销/加组/授权等管理
 - 个性化设置
@@ -50,8 +56,13 @@
 - API文档
     - 各接口生成自动化的API文档，对接外部需求
     
+- 登录
+    - 支持see系统登录
+    - 支持自定义公司统一认证中心(sso)登录
+
 - 通知
     - E-mail邮件推送
+
 - 其他
     - DashBoard数据报表展示
 
@@ -66,23 +77,21 @@
     - iview-admin 1.3
 
 ## 平台使用
-- [在线访问](http://47.105.160.188:8080)
+- [在线访问](http://47.105.160.188:8080) (下表为登录的用户/密码)
   
-|  角色 | 账号 | 密码 |
-| --- | --- | --- |
-|  研发| 武松 | see |
-|  经理| 宋江 | see |
-|  总监| 晁盖 | see |
-|  管理员| see | see |
+| 用户名 | 密码 |
+| --- | --- |
+| 武松 | see |
+| 宋江 | see |
 
 ## 安装文档
 - [安装文档](https://github.com/myide/see/blob/master/frontend/src/files/install.md)
 
 ## 界面展示
 
-- Dashboard审计
+- 邮件提醒
 
-![image](https://github.com/myide/see/blob/master/frontend/src/images/github/dashboard.png)
+![image](https://github.com/myide/see/blob/master/frontend/src/images/github/mail.png)
 
 - SQL查询
 
@@ -108,14 +117,17 @@
 
 ![image](https://github.com/myide/see/blob/master/frontend/src/images/github/list.png)
 
-- 工单设置
+- 平台设置
 
-![image](https://github.com/myide/see/blob/master/frontend/src/images/github/platsettings.png)
+![image](https://github.com/myide/see/blob/master/frontend/src/images/github/plantformsettings.png)
 
 - 用户管理
 
 ![image](https://github.com/myide/see/blob/master/frontend/src/images/github/user.png)
 
+- Dashboard审计
+
+![image](https://github.com/myide/see/blob/master/frontend/src/images/github/dashboard.png)
 
 ## 交流学习
 - QQ群 630791951
